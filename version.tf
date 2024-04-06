@@ -7,4 +7,8 @@ terraform {
       version = "4.51.0"
     }
   }
+  backend "gcs" {
+    bucket = "dev-task-tf-state-dev"
+    prefix = "terraform/state"
+  }
 }
