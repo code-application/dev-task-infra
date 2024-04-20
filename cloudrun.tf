@@ -13,7 +13,10 @@ resource "google_cloud_run_service" "code-devtask-api-run" {
       containers {
         args    = []
         command = []
-        image   = "${var.region}-docker.pkg.dev/${var.project}/${google_artifact_registry_repository.registry.name}/code-devtask-api:v0.0.2"
+        # Cloud Runの初期デプロイ時にはArtifact Registryとイメージもないため空コンテナとして以下のイメージを指定する
+        image = "us-docker.pkg.dev/cloudrun/container/hello"
+        # 実際にデプロイするイメージはGitHub Actionsからデプロイされる
+        # image   = "${var.region}-docker.pkg.dev/${var.project}/${google_artifact_registry_repository.registry.name}/code-devtask-api:v.x.x.x"
 
         ports {
           container_port = 8080

@@ -8,7 +8,7 @@ terraform {
     }
   }
   backend "gcs" {
-    bucket = "dev-task-tf-state-dev"
+    bucket = "devtask-tf-state"
     prefix = "terraform/state"
   }
 }

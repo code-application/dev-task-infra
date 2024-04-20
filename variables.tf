@@ -22,3 +22,15 @@ variable "repository_id" {
   default     = ""
   description = "Docker registry ID"
 }
+
+variable "chiba_gmail_username" {
+  description = "個人ユーザーメールアドレス"
+  type        = string
+  sensitive   = true
+}
+
+variable "suzuki_gmail_username" {
+  description = "個人ユーザーメールアドレス"
+  type        = string
+  sensitive   = true
+}

@@ -1,5 +1,6 @@
-# service account key
-code-devtask-sa-tf.json
+# secrets
+# ex) service account key
+secrets/*
 
 # Local .terraform directories
 **/.terraform/*
@@ -35,3 +36,7 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+
+# .gitkeep自体を一番下に配置したいため、この下には追加しない
+!.gitkeep

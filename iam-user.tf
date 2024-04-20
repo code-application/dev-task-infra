@@ -1,13 +1,29 @@
 locals {
-    chiba_gmail_admin_username = "TBD" // if "abcdef@gmail.com", then "abcdef"
-    chiba_admin_roles = [
-        "roles/admin"
+  member_chiba = {
+    email : var.chiba_gmail_username // if "abcdef@gmail.com", then "abcdef"
+    roles : [
+      "roles/editor"
     ]
+  }
+
+  member_suzuki = {
+    email : var.suzuki_gmail_username // if "abcdef@gmail.com", then "abcdef"
+    roles : [
+      "roles/editor"
+    ]
+  }
 }
 
-resource "google_project_iam_member" "admin_chiba" {
-    for_each = toset(local.chiba_admin_roles) // 指定したリストごとにメンバー・ロールのマッピングを行う
-    project =  var.project
-    member = "${local.chiba_gmail_admin_username}@gmail.com"
-    role = each.value
+resource "google_project_iam_member" "member_chiba" {
+  for_each = toset(local.member_chiba.roles) // 指定したリストごとにメンバー・ロールのマッピングを行う
+  project  = var.project
+  member   = "user:${local.member_chiba.email}@gmail.com"
+  role     = each.value
+}
+
+resource "google_project_iam_member" "member_suzuki" {
+  for_each = toset(local.member_suzuki.roles) // 指定したリストごとにメンバー・ロールのマッピングを行う
+  project  = var.project
+  member   = "user:${local.member_suzuki.email}@gmail.com"
+  role     = each.value
 }

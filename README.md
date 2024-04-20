@@ -21,6 +21,11 @@ $ gcloud projects create <PROJECT_NAME> --name=<NAME>
 # --set-as-default: デフォルトプロジェクトとして設定する
 ```
 
+> [!NOTE]
+> <PROJECT_NAME>は一意にする必要がある
+> 一意でない場合、エラーが発生する
+> ERROR: (gcloud.projects.create) Project creation failed. The project ID you specified is already in use by another project. Please try an alternative ID.
+
 ## gcloud の設定変更
 
 ### 1. 現在の gcloud の設定の確認
@@ -74,28 +79,43 @@ $ gcloud iam service-accounts list
 以下コマンドを実行し、作成したサービスアカウントにエディターロールを付与する。
 
 ```
-$ gcloud projects add-iam-policy-binding <PROJECT_ID> --member=" serviceAccount:<SERVICE_ACCOUNT_EMAIL>" --role="roles/editor"
+$ gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$TF_SA_EMAIL" --role="roles/editor"
+$ gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$TF_SA_EMAIL" --role="roles/resourcemanager.projectIamAdmin"
 ```
 
-`<SERVICE_ACCOUNT_EMAIL>`の確認方法は以下コマンド。出力結果の`EMAIL`列を確認。
+`$SERVICE_ACCOUNT_EMAIL`の確認方法は以下コマンド。出力結果の`EMAIL`列を確認。
 
 ```
 $ gcloud iam service-accounts list
 ```
 
-### 3.
+### 3. Terraform 用のサービスアカウントのキーを生成する
 
-gcloud iam service-accounts keys create code-devtask-sa-tf.json --iam-account=code-devtask-sa-tf@code-dev-task-test-1.iam.gserviceaccount.com
-
-## GCE, GKE の API を有効にする
-
-以下コマンドを実行し、API を有効にする。
+以下コマンドを実行し、サービスアカウントのキーを生成する。
 
 ```
-gcloud services enable container.googleapis.com compute.googleapis.com run.googleapis.com
+gcloud iam service-accounts keys create <OUTPUT_FILE_NAME> --iam-account=$TF_SA_EMAIL
+```
+
+- `<OUTPUT_FILE_NAME>`は出力するファイル名
+  - <PROJECT_ID>-sa-tf.json
+
+## GCE, Cloud Run, GCS の API を有効にする
+
+以下コマンドを実行し、API を有効にする。
+※プロジェクトに請求アカウントの情報が紐づけられている必要がある
+
+```
+gcloud services enable compute.googleapis.com run.googleapis.com storage.googleapis.com iam.googleapis.com cloudresourcemanager.googleapis.com cloudkms.googleapis.com
 
 # Options(任意):
 --async: バックグラウンドで実行され、コンソールがブロックされない
+```
+
+# Terraform State 用のバケットを作成する
+
+```
+gcloud storage buckets create gs://devtask-tf-state-dev
 ```
 
 # Artifact Registry login
@@ -105,3 +125,7 @@ gcloud iam service-accounts create code-devtask-sa-docker --project=code-dev-tas
 
 add role to create accesstoken for serviceaccount
 gcloud projects add-iam-policy-binding code-dev-task-test-1 --member="serviceAccount:code-devtask-sa-docker@code-dev-task-test-1.iam.gserviceaccount.com" --role="roles/iam.serviceAccountTokenCreator"
+
+# Project Number を出力する
+
+$ export PROJECT_NUMBER=$(gcloud projects list --filter="$(gcloud config get-value project)" --format="value(PROJECT_NUMBER)")
